@@ -6,6 +6,11 @@ const CONFIG = {
     SPEEDS: [1.0, 1.25, 1.5, 2.0]
 };
 
+const ICONS = {
+    PLAY: '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>',
+    PAUSE: '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+};
+
 // Application State
 const state = {
     podcasts: [],
@@ -75,15 +80,15 @@ function renderPodcasts() {
         // Button state logic
         const isCurrent = index === state.currentIndex;
         const isPlaying = isCurrent && !UI.audioPlayer.paused;
-        const btnIcon = isPlaying ? '⏸' : '▶';
+        const btnContent = isPlaying ? ICONS.PAUSE : ICONS.PLAY;
         const btnClass = isPlaying ? 'play-button playing' : 'play-button';
 
         li.innerHTML = `
             <div class="podcast-info">
                 <div class="podcast-date">${formatDate(date)}</div>
             </div>
-            <button class="${btnClass}" data-action="play" data-index="${index}">
-                ${btnIcon}
+            <button class="${btnClass}" data-action="play" data-index="${index}" aria-label="${isPlaying ? '일시정지' : '재생'}">
+                ${btnContent}
             </button>
         `;
         
@@ -159,7 +164,8 @@ function updateItemUI(index, isPlaying) {
 
     // Button Style
     if (btn) {
-        btn.textContent = isPlaying ? '⏸' : '▶';
+        btn.innerHTML = isPlaying ? ICONS.PAUSE : ICONS.PLAY;
+        btn.setAttribute('aria-label', isPlaying ? '일시정지' : '재생');
         if (isPlaying) btn.classList.add('playing');
         else btn.classList.remove('playing');
     }
@@ -226,8 +232,8 @@ function init() {
     });
 
     UI.audioPlayer.addEventListener('ended', async () => {
-        if (state.currentIndex < state.podcasts.length - 1) {
-            await playPodcast(state.currentIndex + 1);
+        if (state.currentIndex > 0) {
+            await playPodcast(state.currentIndex - 1);
         } else {
             updateItemUI(state.currentIndex, false);
             UI.podcastList.children[state.currentIndex]?.classList.remove('playing');

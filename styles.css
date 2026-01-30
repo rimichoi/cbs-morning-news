@@ -142,6 +142,13 @@ body {
     transform: scale(0.95);
 }
 
+.play-button svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+}
+
 .play-button.playing {
     background: #f44336;
 }
