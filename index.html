@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2f66ba">
+    <meta name="description" content="CBS 아침뉴스 팟캐스트 플레이어">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="cbs_icon.png" type="image/png">
+    
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CBS 아침뉴스">
+    
+    <title>CBS 아침뉴스 팟캐스트</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>CBS 아침뉴스</h1>
+        <div class="header-controls">
+            <span>월-금 07:00</span>
+            <span class="speed-indicator" id="speedBtn">1.25x</span>
+            <button class="refresh-btn" id="refreshBtn">새로고침</button>
+        </div>
+    </div>
+
+    <div id="error" class="error"></div>
+    <div id="loading" class="loading active">
+        <div>데이터를 불러오는 중입니다...</div>
+    </div>
+    
+    <ul id="podcastList" class="podcast-list"></ul>
+
+    <div id="playerControls" class="player-controls">
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="player-info">
+            <span class="current-date" id="currentDate"></span>
+            <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="none"></audio>
+
+    <!-- App Logic -->
+    <script src="app.js" defer></script>
+</body>
+</html>
