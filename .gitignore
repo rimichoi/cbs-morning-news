@@ -30,3 +30,6 @@ yarn-debug.log*
 # Build output
 dist/
 build/
+
+# custom
+.git_push
