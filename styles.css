@@ -119,6 +119,30 @@ body {
     font-size: 18px;
     font-weight: 600;
     color: #333;
+    margin-bottom: 4px;
+}
+
+.episode-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    overflow: hidden;
+}
+
+.episode-progress-fill {
+    height: 100%;
+    background: #2f66ba;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.episode-progress-text {
+    font-size: 11px;
+    color: #999;
+    font-variant-numeric: tabular-nums;
 }
 
 .play-button {
@@ -211,4 +235,48 @@ body {
     color: #666;
     font-size: 12px;
     font-variant-numeric: tabular-nums;
+}
+
+.playback-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.nav-button {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: #2f66ba;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.nav-button:hover {
+    background: #1e4a8a;
+}
+
+.nav-button:active {
+    transform: scale(0.95);
+}
+
+.nav-button svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+}
+
+.nav-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.5;
 }
