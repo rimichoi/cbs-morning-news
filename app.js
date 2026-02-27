@@ -84,7 +84,6 @@ async function loadPodcasts() {
 }
 
 function renderPodcasts() {
-    console.log('Rendering podcasts, total:', state.podcasts.length);
     UI.podcastList.innerHTML = '';
     
     state.podcasts.forEach((podcast, index) => {
@@ -97,8 +96,6 @@ function renderPodcasts() {
         const progressPercent = getProgressPercent(podcast);
         const progress = getProgress(podcast);
         
-        console.log(`Podcast ${index} (${date}):`, { progressPercent, progress });
-        
         // Button state logic
         const isCurrent = index === state.currentIndex;
         const isPlaying = isCurrent && !UI.audioPlayer.paused;
@@ -106,7 +103,7 @@ function renderPodcasts() {
         const btnClass = isPlaying ? 'play-button playing' : 'play-button';
 
         let progressHTML = '';
-        if (progressPercent > 0) {
+        if (progressPercent > 0 && progress) {
             progressHTML = `
                 <div class="episode-progress-bar">
                     <div class="episode-progress-fill" style="width: ${progressPercent}%"></div>
@@ -244,6 +241,10 @@ function toggleSpeed() {
     UI.audioPlayer.playbackRate = state.currentSpeed;
 }
 
+function isValidIndex(index) {
+    return index >= 0 && index < state.podcasts.length;
+}
+
 async function playPrevious() {
     const nextIndex = state.currentIndex + 1;
     if (isValidIndex(nextIndex)) {
@@ -262,10 +263,8 @@ async function playNext() {
 
 function getProgressKey(podcast) {
     if (!podcast?.field?.broadDate) {
-        console.warn('Invalid podcast data for progress key:', podcast);
         return null;
     }
-    // broadDate만 사용하여 키 생성 (날짜별로 하나의 에피소드만 있음)
     return `progress_${podcast.field.broadDate}`;
 }
 
@@ -280,7 +279,6 @@ function saveProgress(podcast, currentTime, duration) {
             timestamp: Date.now()
         };
         localStorage.setItem(key, JSON.stringify(data));
-        console.log('Progress saved:', key, data);
     } catch (error) {
         console.error('Save progress error:', error);
     }
@@ -302,9 +300,7 @@ function getProgress(podcast) {
 function getProgressPercent(podcast) {
     const progress = getProgress(podcast);
     if (progress && progress.duration > 0) {
-        const percent = Math.min(100, (progress.currentTime / progress.duration) * 100);
-        console.log('Progress percent for', podcast.field.broadDate, ':', percent);
-        return percent;
+        return Math.min(100, (progress.currentTime / progress.duration) * 100);
     }
     return 0;
 }
@@ -461,12 +457,16 @@ async function registerServiceWorker() {
 async function init() {
     try {
         initUI();
+        console.log('UI initialized');
         setupEventListeners();
+        console.log('Event listeners setup');
         await loadPodcasts();
         await registerServiceWorker();
     } catch (error) {
         console.error('Initialization error:', error);
-        showError('앱 초기화 중 오류가 발생했습니다.');
+        if (UI) {
+            showError('앱 초기화 중 오류가 발생했습니다.');
+        }
     }
 }
 
