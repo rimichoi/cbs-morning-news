@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cbs-podcast-v5';
+const CACHE_NAME = 'cbs-podcast-v6';
 const urlsToCache = [
   './index.html',
   './manifest.json',

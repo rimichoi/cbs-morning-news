@@ -10,13 +10,7 @@
   "icons": [
     {
       "src": "cbs_icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "cbs_icon.png",
-      "sizes": "512x512",
+      "sizes": "512X512",
       "type": "image/png",
       "purpose": "any"
     }
