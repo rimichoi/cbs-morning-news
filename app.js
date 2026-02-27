@@ -2,7 +2,7 @@
 
 // Constants & Configuration
 const CONFIG = {
-    API_URL: 'https://www.cbs.co.kr/board/list/cbs_P000250_relisten?sort=field.broadDate&order=desc&limit=50&returnType=ajax&page=1',
+    API_URL: 'https://www.cbs.co.kr/board/list/cbs_P000250_relisten?sort=field.broadDate&order=desc&limit=10&returnType=ajax&page=1',
     SPEEDS: [1.0, 1.25, 1.5, 2.0],
     PROGRESS_SAVE_INTERVAL: 5000,
     MIN_RESUME_TIME: 3

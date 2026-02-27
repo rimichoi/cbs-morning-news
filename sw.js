@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cbs-podcast-v4';
+const CACHE_NAME = 'cbs-podcast-v5';
 const urlsToCache = [
   './index.html',
   './manifest.json',
@@ -8,6 +8,9 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', (event) => {
+  // 즉시 활성화
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(urlsToCache))
@@ -41,29 +44,42 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 기본 리소스 처리: Cache First (캐시 우선, 없으면 네트워크)
+  // 앱 리소스 처리: Network First with Cache Fallback
+  // (앱 업데이트를 즉시 반영하면서 오프라인도 지원)
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        if (response) {
-          return response;
+        // 응답이 있으면 캐시 업데이트
+        if (response && response.status === 200) {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
         }
-        return fetch(event.request);
+        return response;
+      })
+      .catch(() => {
+        // 네트워크 실패 시 캐시에서 조회
+        return caches.match(event.request);
       })
   );
 });
 
-// 오래된 캐시 정리
+// 오래된 캐시 정리 및 즉시 제어권 획득
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // 모든 클라이언트에 대해 즉시 제어권 획득
+      return self.clients.claim();
     })
   );
 });
