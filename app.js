@@ -421,6 +421,19 @@ function handleAudioTimeUpdate() {
     UI.timeDisplay.textContent =
         `${formatTime(UI.audioPlayer.currentTime)} / ${formatTime(UI.audioPlayer.duration)}`;
 
+    // Update Media Session position state
+    if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+        try {
+            navigator.mediaSession.setPositionState({
+                duration: UI.audioPlayer.duration,
+                playbackRate: UI.audioPlayer.playbackRate,
+                position: UI.audioPlayer.currentTime
+            });
+        } catch (error) {
+            console.error('Media session position state error:', error);
+        }
+    }
+
     // Save progress periodically
     const now = Date.now();
     if (isValidIndex(state.currentIndex) && now - state.lastSaveTime > CONFIG.PROGRESS_SAVE_INTERVAL) {
