@@ -181,6 +181,48 @@ function showPlayerControls(podcast) {
     UI.playerControls.classList.add('active');
     UI.currentDate.textContent = formatDate(podcast.field.broadDate);
     document.body.style.paddingBottom = `${UI.playerControls.offsetHeight + 20}px`;
+    updateMediaSession(podcast);
+}
+
+function updateMediaSession(podcast) {
+    if (!('mediaSession' in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'CBS 아침뉴스',
+        artist: formatDate(podcast.field.broadDate),
+        album: 'CBS 라디오',
+        artwork: [
+            { src: 'cbs_icon.png', sizes: '512x512', type: 'image/png' }
+        ]
+    });
+
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+        playPrevious().catch(err => {
+            console.error('Media session previous error:', err);
+        });
+    });
+
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+        playNext().catch(err => {
+            console.error('Media session next error:', err);
+        });
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => {
+        UI.audioPlayer.play().catch(err => {
+            console.error('Media session play error:', err);
+        });
+    });
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+        UI.audioPlayer.pause();
+    });
+
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime && UI.audioPlayer.duration) {
+            UI.audioPlayer.currentTime = details.seekTime;
+        }
+    });
 }
 
 function normalizeAudioUrl(url) {
