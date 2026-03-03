@@ -1,5 +1,23 @@
 'use strict';
 
+/**
+ * @typedef {Object} PodcastField
+ * @property {string} broadDate - 방송 날짜
+ * @property {string} audioUrl - 오디오 파일 URL
+ */
+
+/**
+ * @typedef {Object} Podcast
+ * @property {PodcastField} field - 팟캐스트 필드 정보
+ */
+
+/**
+ * @typedef {Object} Progress
+ * @property {number} currentTime - 현재 재생 시간
+ * @property {number} duration - 전체 재생 시간
+ * @property {number} timestamp - 저장된 시간
+ */
+
 // Constants & Configuration
 const CONFIG = {
     API_URL: 'https://www.cbs.co.kr/board/list/cbs_P000250_relisten?sort=field.broadDate&order=desc&limit=10&returnType=ajax&page=1',
@@ -15,6 +33,7 @@ const ICONS = {
 
 // Application State
 const state = {
+    /** @type {Podcast[]} */
     podcasts: [],
     currentIndex: -1,
     currentSpeed: 1.25,
@@ -91,7 +110,7 @@ function renderPodcasts() {
     state.podcasts.forEach((podcast, index) => {
         const li = document.createElement('li');
         li.className = 'podcast-item';
-        li.dataset.index = index;
+        li.dataset.index = String(index);
         if (index === state.currentIndex) li.classList.add('playing');
 
         const date = podcast.field.broadDate;
@@ -135,7 +154,7 @@ async function playPodcast(index) {
     }
 
     if (state.currentIndex === index) {
-        togglePlayback(index);
+        await togglePlayback(index);
         return;
     }
 
@@ -421,7 +440,7 @@ async function handleAudioEnded() {
             clearProgress(state.podcasts[state.currentIndex]);
         }
 
-        // Auto-play next episode
+        // Autoplay next episode
         const nextIndex = state.currentIndex - 1;
         if (isValidIndex(nextIndex)) {
             await playPodcast(nextIndex);
