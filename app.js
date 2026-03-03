@@ -48,7 +48,7 @@ function initUI() {
 
 async function loadPodcasts() {
     if (state.isLoading) return;
-    
+
     state.isLoading = true;
     UI.loading.classList.add('active');
     UI.error.style.display = 'none';
@@ -59,15 +59,15 @@ async function loadPodcasts() {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         state.podcasts = data.items || [];
-        
+
         if (state.podcasts.length === 0) {
             showError('팟캐스트 목록이 비어있습니다.');
             return;
         }
-        
+
         renderPodcasts();
     } catch (error) {
         console.error('Load podcasts error:', error);
@@ -85,17 +85,17 @@ async function loadPodcasts() {
 
 function renderPodcasts() {
     UI.podcastList.innerHTML = '';
-    
+
     state.podcasts.forEach((podcast, index) => {
         const li = document.createElement('li');
         li.className = 'podcast-item';
         li.dataset.index = index;
         if (index === state.currentIndex) li.classList.add('playing');
-        
+
         const date = podcast.field.broadDate;
         const progressPercent = getProgressPercent(podcast);
         const progress = getProgress(podcast);
-        
+
         // Button state logic
         const isCurrent = index === state.currentIndex;
         const isPlaying = isCurrent && !UI.audioPlayer.paused;
@@ -121,7 +121,7 @@ function renderPodcasts() {
                 ${btnContent}
             </button>
         `;
-        
+
         UI.podcastList.appendChild(li);
     });
 }
@@ -131,22 +131,22 @@ async function playPodcast(index) {
         console.warn('Invalid podcast index:', index);
         return;
     }
-    
+
     if (state.currentIndex === index) {
         togglePlayback(index);
         return;
     }
-    
+
     const prevIndex = state.currentIndex;
     state.currentIndex = index;
     const podcast = state.podcasts[index];
-    
+
     // UI Update for Previous Item
     updateItemUI(prevIndex, false);
-    
+
     // UI Update for Current Item
     updateItemUI(index, true);
-    
+
     // Audio Setup
     const audioUrl = normalizeAudioUrl(podcast.field.audioUrl);
     if (!audioUrl) {
@@ -154,22 +154,22 @@ async function playPodcast(index) {
         updateItemUI(index, false);
         return;
     }
-    
+
     UI.audioPlayer.src = audioUrl;
-    
+
     try {
         // Load saved progress
         const savedProgress = getProgress(podcast);
         if (savedProgress && savedProgress.currentTime > CONFIG.MIN_RESUME_TIME) {
             UI.audioPlayer.currentTime = savedProgress.currentTime;
         }
-        
+
         await UI.audioPlayer.play();
         UI.audioPlayer.playbackRate = state.currentSpeed;
-        
+
         // Show Controls
         showPlayerControls(podcast);
-        
+
     } catch (error) {
         console.error('Play error:', error);
         showError(`재생할 수 없습니다: ${error.message}`);
@@ -209,13 +209,13 @@ async function togglePlayback(index) {
 
 function updateItemUI(index, isPlaying) {
     if (index === -1) return;
-    
+
     const items = UI.podcastList.children;
     if (index >= items.length) return;
-    
+
     const li = items[index];
     const btn = li.querySelector('.play-button');
-    
+
     // List Item Style
     if (isPlaying || index === state.currentIndex) {
         li.classList.add('playing');
@@ -236,7 +236,7 @@ function toggleSpeed() {
     let idx = CONFIG.SPEEDS.indexOf(state.currentSpeed);
     idx = (idx + 1) % CONFIG.SPEEDS.length;
     state.currentSpeed = CONFIG.SPEEDS[idx];
-    
+
     UI.speedBtn.textContent = state.currentSpeed + 'x';
     UI.audioPlayer.playbackRate = state.currentSpeed;
 }
@@ -271,7 +271,7 @@ function getProgressKey(podcast) {
 function saveProgress(podcast, currentTime, duration) {
     const key = getProgressKey(podcast);
     if (!key) return;
-    
+
     try {
         const data = {
             currentTime,
@@ -287,7 +287,7 @@ function saveProgress(podcast, currentTime, duration) {
 function getProgress(podcast) {
     const key = getProgressKey(podcast);
     if (!key) return null;
-    
+
     try {
         const data = localStorage.getItem(key);
         return data ? JSON.parse(data) : null;
@@ -308,7 +308,7 @@ function getProgressPercent(podcast) {
 function clearProgress(podcast) {
     const key = getProgressKey(podcast);
     if (!key) return;
-    
+
     try {
         localStorage.removeItem(key);
     } catch (error) {
@@ -355,13 +355,13 @@ function handlePodcastClick(e) {
 
 function handleAudioTimeUpdate() {
     if (!UI.audioPlayer.duration) return;
-    
+
     const progress = (UI.audioPlayer.currentTime / UI.audioPlayer.duration) * 100;
     UI.progressFill.style.width = `${progress}%`;
-    
-    UI.timeDisplay.textContent = 
+
+    UI.timeDisplay.textContent =
         `${formatTime(UI.audioPlayer.currentTime)} / ${formatTime(UI.audioPlayer.duration)}`;
-    
+
     // Save progress periodically
     const now = Date.now();
     if (isValidIndex(state.currentIndex) && now - state.lastSaveTime > CONFIG.PROGRESS_SAVE_INTERVAL) {
@@ -380,7 +380,7 @@ async function handleAudioEnded() {
         if (isValidIndex(state.currentIndex)) {
             clearProgress(state.podcasts[state.currentIndex]);
         }
-        
+
         // Auto-play next episode
         const nextIndex = state.currentIndex - 1;
         if (isValidIndex(nextIndex)) {
@@ -389,7 +389,7 @@ async function handleAudioEnded() {
             updateItemUI(state.currentIndex, false);
             UI.podcastList.children[state.currentIndex]?.classList.remove('playing');
         }
-        
+
         // Refresh list to update progress bars
         renderPodcasts();
     } catch (error) {
@@ -401,7 +401,7 @@ function handleProgressBarClick(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const clickedValue = x / rect.width;
-    
+
     if (UI.audioPlayer.duration) {
         UI.audioPlayer.currentTime = clickedValue * UI.audioPlayer.duration;
     }
@@ -410,7 +410,7 @@ function handleProgressBarClick(e) {
 function setupEventListeners() {
     // Podcast List
     UI.podcastList.addEventListener('click', handlePodcastClick);
-    
+
     // Controls
     UI.speedBtn.addEventListener('click', toggleSpeed);
     UI.refreshBtn.addEventListener('click', () => {
@@ -428,7 +428,7 @@ function setupEventListeners() {
             console.error('Play next error:', err);
         });
     });
-    
+
     // Audio Player Events
     UI.audioPlayer.addEventListener('timeupdate', handleAudioTimeUpdate);
     UI.audioPlayer.addEventListener('ended', () => {
@@ -436,7 +436,7 @@ function setupEventListeners() {
             console.error('Handle audio ended error:', err);
         });
     });
-    
+
     // Progress Bar
     UI.progressBar.addEventListener('click', handleProgressBarClick);
 }
