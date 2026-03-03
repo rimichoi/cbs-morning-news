@@ -57,7 +57,9 @@ async function loadPodcasts() {
     try {
         const response = await fetch(CONFIG.API_URL);
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            console.error(`HTTP ${response.status}: ${response.statusText}`);
+            showError(`팟캐스트를 불러오는데 실패했습니다: HTTP ${response.status}`);
+            return;
         }
 
         const data = await response.json();
@@ -281,10 +283,6 @@ function toggleSpeed() {
 
     UI.speedBtn.textContent = state.currentSpeed + 'x';
     UI.audioPlayer.playbackRate = state.currentSpeed;
-}
-
-function isValidIndex(index) {
-    return index >= 0 && index < state.podcasts.length;
 }
 
 async function playPrevious() {
